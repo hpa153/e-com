@@ -1,0 +1,23 @@
+html {
+  height: 100%;
+}
+
+body {
+  padding-bottom: 4rem;
+  position: relative;
+  min-height: 100%;
+}
+
+.carousel__image {
+  height: 18.75rem;
+  object-fit: cover;
+}
+
+.carousel__subtitle-pointer {
+  cursor: pointer;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+}

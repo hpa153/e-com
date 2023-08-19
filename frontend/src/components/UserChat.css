@@ -1,0 +1,78 @@
+.chat-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  right: 1rem;
+  bottom: 2rem;
+  cursor: pointer;
+  background-color: blue;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  color: white;
+  font-size: 1.5rem;
+  z-index: 10;
+}
+
+.chat-btn__close {
+  display: none !important;
+}
+
+#chat {
+  display: none;
+}
+
+#chat:checked ~ .chat-btn i {
+  display: block;
+}
+
+#chat:checked ~ .chat-btn__open {
+  display: none;
+}
+
+#chat:checked ~ .chat-wrapper {
+  opacity: 1;
+}
+
+.chat-wrapper {
+  opacity: 0;
+  position: fixed;
+  right: 3rem;
+  bottom: 6.75rem;
+  z-index: 10;
+  width: 18.75rem;
+  transition: all 0.4s;
+  background-color: white;
+  border-radius: 5px;
+}
+
+.chat-header {
+  background-color: blue;
+  padding: 0.75rem;
+  border-radius: 5px 5px 0px 0px;
+  color: #fff;
+}
+
+.chat-form {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-form__message, .chat-form__textbox, .chat-form button {
+  margin-bottom: 0.6rem;
+}
+
+.chat-form__textbox {
+  resize: none;
+}
+
+.chat-form__control:focus, .btn:focus {
+  box-shadow: none;
+}
+
+.chat-form__message {
+  max-height: 300px;
+  overflow: auto;
+}
