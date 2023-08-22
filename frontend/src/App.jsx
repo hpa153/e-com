@@ -24,10 +24,13 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminUsers from "./pages/admin/AdminUsers";
 import RouteProtector from "./components/RouteProtector";
+import ScrollToTop from "./utils/ScrollToTop";
 
 const App = () => {
   return (
     <BrowserRouter>
+      {/* Apply scrolling to top to all routes */}
+      <ScrollToTop />
       <Header />
       <Routes>
         {/* Apply chat component to public routes */}

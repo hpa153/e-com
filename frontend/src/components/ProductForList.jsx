@@ -1,17 +1,37 @@
-import { Card, Button } from "react-bootstrap";
+import { Card, Button, Row, Col } from "react-bootstrap";
+import { Rating } from "react-simple-star-rating";
+import { LinkContainer } from "react-router-bootstrap";
 
-const ProductForList = () => {
+const ProductForList = ({ images, idx }) => {
   return (
-    <Card style={{ width: "18rem" }}>
-      <Card.Img variant="top" src="/images/tablets-category.png" />
-      <Card.Body>
-        <Card.Title>Card Title</Card.Title>
-        <Card.Text>
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </Card.Text>
-        <Button variant="primary">Go somewhere</Button>
-      </Card.Body>
+    <Card style={{ marginTop: "1.5rem", marginBottom: "2.5rem" }}>
+      <Row>
+        <Col lg={5}>
+          <Card.Img
+            variant="top"
+            src={"/images/" + images[idx] + "-category.png"}
+          />
+        </Col>
+        <Col lg={7}>
+          <Card.Body>
+            <Card.Title>Card Title</Card.Title>
+            <Card.Text>
+              Some quick example text to build on the card title and make up the
+              bulk of the card's content.
+            </Card.Text>
+            <Card.Text>
+              <Rating readonly size={20} initialValue={5} />
+              &nbsp;(1)
+            </Card.Text>
+            <Card.Text>
+              $124{" "}
+              <LinkContainer to="/product-details">
+                <Button variant="danger">View Details</Button>
+              </LinkContainer>
+            </Card.Text>
+          </Card.Body>
+        </Col>
+      </Row>
     </Card>
   );
 };
