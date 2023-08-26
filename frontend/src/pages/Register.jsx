@@ -39,7 +39,7 @@ const Register = () => {
     <Container>
       <Row className="mt-5 justify-content-md-center">
         <Col md={6}>
-          <h2>Register</h2>
+          <h1>Register</h1>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="validationCustom01">
               <Form.Label>First name</Form.Label>
@@ -95,12 +95,12 @@ const Register = () => {
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3" controlId="validationCustom05">
-              <Form.Label>Retype Password </Form.Label>
+              <Form.Label>Confirm Password </Form.Label>
               <Form.Control
                 name="passwordRetype"
                 required
                 type="password"
-                placeholder="Retype Password"
+                placeholder="Confirm Password"
                 onChange={passwordMatchVerification}
               />
               <Form.Control.Feedback type="invalid">

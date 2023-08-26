@@ -49,10 +49,7 @@ const App = () => {
         <Route element={<RouteProtector admin={false} />}>
           <Route path="/user/profile" element={<UserProfile />} />
           <Route path="/user/my-orders" element={<UserOrders />} />
-          <Route
-            path="/user/order-details/:id"
-            element={<UserOrderDetails />}
-          />
+          <Route path="/user/order-details" element={<UserOrderDetails />} />
           <Route path="/user/cart" element={<UserCartDetails />} />
         </Route>
 
@@ -64,15 +61,9 @@ const App = () => {
             path="/admin/create-product"
             element={<AdminCreateProducts />}
           />
-          <Route
-            path="/admin/edit-product/:id"
-            element={<AdminEditProduct />}
-          />
+          <Route path="/admin/edit-product" element={<AdminEditProduct />} />
           <Route path="/admin/edit-user/:id" element={<AdminEditUser />} />
-          <Route
-            path="/admin/order-details/:id"
-            element={<AdminOrderDetails />}
-          />
+          <Route path="/admin/order-details" element={<AdminOrderDetails />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/users" element={<AdminUsers />} />
