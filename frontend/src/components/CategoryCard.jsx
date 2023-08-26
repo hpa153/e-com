@@ -5,7 +5,11 @@ import { LinkContainer } from "react-router-bootstrap";
 const CategoryCard = ({ title }) => {
   return (
     <Card>
-      <Card.Img variant="top" src="images/tablets-category.png" />
+      <Card.Img
+        crossOrigin="anonymous"
+        variant="top"
+        src="images/tablets-category.png"
+      />
       <Card.Body>
         <Card.Title>{title}</Card.Title>
         <Card.Text>
