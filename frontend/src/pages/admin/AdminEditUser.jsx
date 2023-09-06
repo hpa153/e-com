@@ -29,7 +29,7 @@ const AdminEditUser = () => {
             <Form.Group className="mb-3" controlId="formBasicFirstName">
               <Form.Label>First name</Form.Label>
               <Form.Control
-                name="name"
+                name="firstName"
                 required
                 type="text"
                 defaultValue="John"
