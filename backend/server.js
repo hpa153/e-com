@@ -1,4 +1,5 @@
 const express = require("express");
+const fileUpload = require("express-fileupload");
 
 const apiRouter = require("./routes/apiRoutes");
 // const connectDB = require("./config/db");
@@ -9,6 +10,7 @@ require("dotenv").config();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload());
 
 const PORT = 5000;
 // connectDB();

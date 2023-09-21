@@ -1,10 +1,16 @@
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const fs = require("fs");
+
 const Product = require("../models/ProductModel");
 const prodsPerPage = require("../config/pagination");
+const validateImages = require("../utils/validateImages");
 
 const getProducts = async (req, res, next) => {
   // Pagination
   const pageNum = req.query.pageNum || 1;
   const totalProds = await Product.countDocuments({});
+  let queryCondition = false;
 
   // Sort products
   let sort = {};
@@ -185,10 +191,139 @@ const deleteProduct = async (req, res, next) => {
   }
 };
 
+const createAdminProduct = async (req, res, next) => {
+  try {
+    const newProduct = new Product();
+    const { name, description, count, price, category, attributesTable } =
+      req.body;
+
+    newProduct.name = name;
+    newProduct.description = description;
+    newProduct.count = count;
+    newProduct.price = price;
+    newProduct.category = category;
+
+    if (attributesTable.length > 0) {
+      attributesTable.map((item) => {
+        newProduct.attrs.push(item);
+      });
+    }
+
+    await newProduct.save();
+
+    res.json({ message: "Product was created!", productId: newProduct._id });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateAdminProduct = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id).orFail();
+    const { name, description, count, price, category, attributesTable } =
+      req.body;
+
+    product.name = name || product.name;
+    product.description = description || product.description;
+    product.count = count || product.count;
+    product.price = price || product.price;
+    product.category = category || product.category;
+
+    if (attributesTable.length > 0) {
+      attributesTable.map((item) => {
+        product.attrs.push(item);
+      });
+    } else {
+      product.attrs = product.attrs;
+    }
+
+    await product.save();
+
+    res.json({ message: "Product was updated!" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const uploadFile = async (req, res, next) => {
+  try {
+    let uploadedImages = req.files.images;
+
+    if (!req.files || !!uploadedImages === false) {
+      return res.status(400).send("No files found!");
+    }
+
+    const validationResult = validateImages(uploadedImages);
+
+    if (validationResult.error) {
+      return res.status(400).send(validationResult.error);
+    }
+
+    const product = await Product.findById(req.query.productId).orFail();
+
+    const uploadDir = path.resolve(
+      __dirname,
+      "../../frontend",
+      "public",
+      "images",
+      "products"
+    );
+
+    if (!Array.isArray(uploadedImages)) {
+      uploadedImages = [uploadedImages];
+    }
+
+    for (let image of uploadedImages) {
+      const fileName = uuidv4() + path.extname(image.name);
+      const uploadPath = uploadDir + "/" + fileName;
+
+      product.images.push({ path: "/images/products/" + fileName });
+
+      image.mv(uploadPath, function (err) {
+        if (err) {
+          return res.status(500).send(err);
+        }
+      });
+    }
+
+    await product.save();
+
+    res.send("Images were uploaded!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteFile = async (req, res, next) => {
+  try {
+    const imagePath = decodeURIComponent(req.params.imagePath);
+    const finalPath = path.resolve("../frontend/public") + imagePath;
+
+    fs.unlink(finalPath, (err) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+    });
+
+    await Product.findOneAndUpdate(
+      { _id: req.params.productId },
+      { $pull: { images: { path: imagePath } } }
+    ).orFail();
+
+    res.send("Image was deleted!");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
   getBestSellers,
   getAdminProducts,
   deleteProduct,
+  createAdminProduct,
+  updateAdminProduct,
+  uploadFile,
+  deleteFile,
 };
