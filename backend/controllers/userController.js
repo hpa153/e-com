@@ -1,4 +1,6 @@
 const User = require("../models/UserModel");
+const Review = require("../models/ReviewModel");
+const Product = require("../models/ProductModel");
 const { hashPassword, comparePasswords } = require("../utils/hashPassword");
 const generateAuthToken = require("../utils/generateAuthToken");
 
@@ -12,7 +14,7 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-const getUser = async (req, res, next) => {
+const getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).orFail();
 
@@ -153,7 +155,7 @@ const updateUser = async (req, res, next) => {
       success: "User profile was updated",
       userUpdated: {
         _id: user._id,
-        name: user.firstName,
+        firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         isAdmin: user.isAdmin,
@@ -164,4 +166,113 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-module.exports = { getUsers, getUser, registerUser, loginUser, updateUser };
+const writeReview = async (req, res, next) => {
+  try {
+    const { comment, rating } = req.body;
+
+    if (!(comment && rating)) {
+      return res.status(400).send("All inputs are required!");
+    }
+
+    const product = await Product.findById(req.params.productId).populate(
+      "reviews"
+    );
+
+    // Check if user already reviewed product
+    const alreadyReviewed = product.reviews.find(
+      (review) => review.user._id.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      return res.status(400).send("You already reviewed this product!");
+    }
+
+    // Create review
+    const ObjectId = require("mongodb").ObjectId;
+    const reviewId = new ObjectId();
+
+    await Review.create([
+      {
+        _id: reviewId,
+        comment,
+        rating,
+        user: {
+          _id: req.user._id,
+          name: req.user.firstName + " " + req.user.lastName,
+        },
+      },
+    ]);
+
+    // Add review and calculate rating
+    const tempRating = [...product.reviews, { rating }];
+    product.reviews.push(reviewId);
+
+    if (product.reviews.length === 1) {
+      product.rating = Number(rating);
+      product.reviewsNumber = 1;
+    } else {
+      product.reviewsNumber = product.reviews.length;
+      product.rating =
+        tempRating
+          .map((review) => review.rating)
+          .reduce((sum, rating) => sum + rating, 0) / product.reviews.length;
+    }
+
+    await product.save();
+
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select("firstName lastName email isAdmin")
+      .orFail();
+
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUserAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).orFail();
+    user.firstName = req.body.firstName || user.firstName;
+    user.lastName = req.body.lastName || user.lastName;
+    user.email = req.body.email || user.email;
+    user.isAdmin = req.body.isAdmin || user.isAdmin;
+
+    await user.save();
+
+    res.send("Successfully updated user!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).orFail();
+    await user.deleteOne();
+
+    res.send("Deleted user!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getUsers,
+  getUserProfile,
+  registerUser,
+  loginUser,
+  updateUser,
+  writeReview,
+  getUser,
+  updateUserAdmin,
+  deleteUser,
+};
