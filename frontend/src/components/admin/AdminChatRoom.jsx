@@ -50,10 +50,10 @@ const AdminChatRoom = () => {
             {Array.from({ length: 30 }).map((_, idx) => (
               <Fragment key={idx}>
                 <p className="bg-primary p-3 ms-4 text-light rounded-pill">
-                  <b>User wrote:</b> Hello, world! This is a chat message.
+                  <b>User:</b> Hello, world! This is a chat message.
                 </p>
                 <p>
-                  <b>Admin wrote:</b> Hello, world! This is a chat message.
+                  <b>Admin:</b> Hello, world! This is a chat message.
                 </p>
               </Fragment>
             ))}

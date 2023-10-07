@@ -1,4 +1,5 @@
 import { Row, Col, Container, ListGroup, Button } from "react-bootstrap";
+import axios from "axios";
 
 import PaginationComponent from "../components/Pagination";
 import ProductForList from "../components/ProductForList";
@@ -9,6 +10,7 @@ import CategoryFilter from "../components/filterQueryResultOptions/CategoryFilte
 import AttributesFilter from "../components/filterQueryResultOptions/AttributeFilter";
 
 const ProductList = () => {
+  axios.get("/api/products").then((res) => console.log(res));
   return (
     <Container fluid>
       <Row>
@@ -33,7 +35,7 @@ const ProductList = () => {
               <AttributesFilter />
             </ListGroup.Item>
             <ListGroup.Item>
-              <Button variant="primary">Filter</Button>
+              <Button variant="primary">Filter</Button>&nbsp;
               <Button variant="danger">Reset</Button>
             </ListGroup.Item>
           </ListGroup>

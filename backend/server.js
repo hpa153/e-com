@@ -25,10 +25,16 @@ app.use("/api", apiRouter);
 
 // handle errors
 app.use((err, req, res, next) => {
-  res.status(500).json({
-    message: err.message,
-    stack: err.stack,
-  });
+  if (process.env.NODE_ENV === "development") {
+    res.status(500).json({
+      message: err.message,
+      stack: err.stack,
+    });
+  } else {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
 });
 
 /*
