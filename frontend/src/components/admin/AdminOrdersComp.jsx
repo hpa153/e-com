@@ -8,9 +8,13 @@ const AdminOrdersComp = ({ fetchOrders }) => {
   const [orders, setOrders] = useState([]);
 
   const getOrders = async () => {
-    const orders = await fetchOrders();
+    try {
+      const orders = await fetchOrders();
 
-    setOrders(orders);
+      setOrders(orders);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -37,35 +41,36 @@ const AdminOrdersComp = ({ fetchOrders }) => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, idx) => (
-              <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>
-                  {
-                    <>
-                      {order.user.firstName} {order.user.lastName}
-                    </>
-                  }
-                </td>
-                <td>{order.createdAt.substring(0, 10)}</td>
-                <td>${order.orderTotal.cartSubtotal}</td>
-                <td>
-                  <i
-                    className={
-                      order.isDelivered
-                        ? "bi bi-check-lg text-success"
-                        : "bi bi-x-lg text-danger"
+            {orders &&
+              orders.map((order, idx) => (
+                <tr key={idx}>
+                  <td>{idx + 1}</td>
+                  <td>
+                    {
+                      <>
+                        {order.user.firstName} {order.user.lastName}
+                      </>
                     }
-                  ></i>
-                </td>
-                <td>{order.paymentMethod}</td>
-                <td>
-                  <Link to={`/admin/order-details/${order._id}`}>
-                    View order
-                  </Link>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>{order.createdAt.substring(0, 10)}</td>
+                  <td>${order.orderTotal.cartSubtotal}</td>
+                  <td>
+                    <i
+                      className={
+                        order.isDelivered
+                          ? "bi bi-check-lg text-success"
+                          : "bi bi-x-lg text-danger"
+                      }
+                    ></i>
+                  </td>
+                  <td>{order.paymentMethod}</td>
+                  <td>
+                    <Link to={`/admin/order-details/${order._id}`}>
+                      View order
+                    </Link>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </Table>
       </Col>
