@@ -1,90 +1,32 @@
-import { useState } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Form,
-  Button,
-  Spinner,
-  Alert,
-} from "react-bootstrap";
-import { Link } from "react-router-dom";
+import axios from "axios";
 
-const Login = () => {
-  const [validated, setValidated] = useState(false);
+import LoginComp from "../components/user/loginComp";
 
-  const handleSubmit = (event) => {
-    const form = event.currentTarget;
+const loginRequest = async (email, password, doNotLogout) => {
+  try {
+    const user = await axios.post("/api/users/login", {
+      email,
+      password,
+      doNotLogout,
+    });
 
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+    if (user.data.userLoggedIn.doNotLogout) {
+      localStorage.setItem("userInfo", JSON.stringify(user.data.userLoggedIn));
+    } else {
+      sessionStorage.setItem(
+        "userInfo",
+        JSON.stringify(user.data.userLoggedIn)
+      );
     }
 
-    setValidated(true);
-  };
+    return user.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-  return (
-    <Container>
-      <Row className="mt-5 justify-content-md-center">
-        <Col md={6}>
-          <h1>Login</h1>
-          <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="validationCustom03">
-              <Form.Label>Email address</Form.Label>
-              <Form.Control
-                name="email"
-                required
-                type="email"
-                placeholder="Email address"
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your email address!
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="validationCustom04">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                name="password"
-                required
-                type="password"
-                placeholder="Password"
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your password!
-              </Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="validationCustom04">
-              <Form.Check
-                name="doNotLogout"
-                type="checkbox"
-                label="Don't log me out"
-              />
-            </Form.Group>
-            <Row className="pb-2">
-              <Col>
-                Don't have an account?&nbsp;
-                <Link to="/register">Register here</Link>
-              </Col>
-            </Row>
-            <Button type="submit">
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-              />
-              Login
-            </Button>
-            <Alert show={true} variant="danger" className="mt-3">
-              Please enter valid credentials!
-            </Alert>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
-  );
+const Login = () => {
+  return <LoginComp loginRequest={loginRequest} />;
 };
 
 export default Login;

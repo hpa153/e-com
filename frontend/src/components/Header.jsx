@@ -10,8 +10,13 @@ import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import { LinkContainer } from "react-router-bootstrap";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+
+import { logoutUser } from "../redux/actions/userActions";
 
 const Header = () => {
+  const dispatch = useDispatch();
+
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
@@ -55,7 +60,9 @@ const Header = () => {
               >
                 My Profile
               </NavDropdown.Item>
-              <NavDropdown.Item>Logout</NavDropdown.Item>
+              <NavDropdown.Item onClick={() => dispatch(logoutUser())}>
+                Logout
+              </NavDropdown.Item>
             </NavDropdown>
             <LinkContainer to="/login">
               <Nav.Link>Login</Nav.Link>
