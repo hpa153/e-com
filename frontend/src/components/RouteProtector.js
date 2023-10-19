@@ -13,7 +13,7 @@ const RouteProtector = ({ admin }) => {
       try {
         const accessToken = await axios.get("/api/get-token");
 
-        if (accessToken.data.isAdmin) {
+        if (accessToken.status === 200) {
           setIsAuth(accessToken.data);
         }
       } catch (error) {
@@ -28,7 +28,7 @@ const RouteProtector = ({ admin }) => {
     return <Login />;
   }
 
-  return !(isAuth && admin) ? (
+  return !isAuth ? (
     <Navigate to="/login" />
   ) : isAuth && admin ? (
     <Outlet />

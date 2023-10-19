@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
   Container,
   Row,
@@ -12,31 +12,17 @@ import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 import { setReduxUser } from "../../redux/actions/userActions";
+import { passwordMatchVerification } from "../../utils";
 
 const RegisterComp = ({ registerUser }) => {
+  const [validated, setValidated] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [registerState, setRegisterState] = useState({
-    error: "",
+    error: false,
     loading: false,
   });
-
-  const passwordMatchVerification = useCallback(() => {
-    setRegisterState({
-      error: "",
-      loading: false,
-    });
-
-    const password = document.querySelector("input[name=password");
-    const passwordRetype = document.querySelector("input[name=passwordRetype");
-
-    if (passwordRetype.value === password.value) {
-      passwordRetype.setCustomValidity("");
-      return true;
-    }
-
-    return false;
-  }, []);
+  const [isPasswordsMatch, setIsPasswordsMatch] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -77,26 +63,21 @@ const RegisterComp = ({ registerUser }) => {
           }
         } else {
           setRegisterState({
-            error: passwordMatchVerification() ? "user" : "pass",
+            error: true,
             loading: false,
           });
         }
       } catch (error) {
         setRegisterState({
-          error: "user",
+          error: true,
           loading: false,
         });
       }
-    } else {
-      setRegisterState({
-        error: !(firstName && lastName && email && password)
-          ? "input"
-          : passwordMatchVerification()
-          ? "user"
-          : "pass",
-        loading: false,
-      });
+    } else if (!passwordMatchVerification()) {
+      setIsPasswordsMatch(true);
     }
+
+    setValidated(true);
   };
 
   return (
@@ -104,7 +85,7 @@ const RegisterComp = ({ registerUser }) => {
       <Row className="mt-5 justify-content-md-center">
         <Col md={6}>
           <h1>Register</h1>
-          <Form noValidate onSubmit={handleSubmit}>
+          <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="validationCustom01">
               <Form.Label>First name</Form.Label>
               <Form.Control
@@ -150,6 +131,7 @@ const RegisterComp = ({ registerUser }) => {
                 placeholder="Password"
                 minLength={6}
                 onChange={passwordMatchVerification}
+                isInvalid={isPasswordsMatch}
               />
               <Form.Control.Feedback type="invalid">
                 Please enter your password!
@@ -161,11 +143,12 @@ const RegisterComp = ({ registerUser }) => {
             <Form.Group className="mb-3" controlId="validationCustom05">
               <Form.Label>Confirm Password </Form.Label>
               <Form.Control
-                name="passwordRetype"
+                name="confirmedPassword"
                 required
                 type="password"
                 placeholder="Confirm Password"
                 onChange={passwordMatchVerification}
+                isInvalid={isPasswordsMatch}
               />
               <Form.Control.Feedback type="invalid">
                 Please make sure both passwords match!
@@ -191,11 +174,7 @@ const RegisterComp = ({ registerUser }) => {
             </Button>
             {registerState.error && (
               <Alert show={true} variant="danger" className="mt-3">
-                {registerState.error === "user"
-                  ? "This email address has already been used!"
-                  : registerState.error === "input"
-                  ? "Please fill out all fields!"
-                  : "Please make sure both passwords match!"}
+                This email address has already been used!
               </Alert>
             )}
           </Form>
