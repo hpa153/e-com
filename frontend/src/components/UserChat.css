@@ -16,27 +16,29 @@
 }
 
 .chat-btn__close {
-  display: none !important;
+  display: none;
 }
 
 #chat {
   display: none;
 }
 
-#chat:checked ~ .chat-btn i {
+#chat:checked ~ .chat-btn i.chat-btn__close {
   display: block;
 }
 
-#chat:checked ~ .chat-btn__open {
+#chat:checked ~ .chat-btn i.chat-btn__open {
   display: none;
 }
 
 #chat:checked ~ .chat-wrapper {
   opacity: 1;
+  display: block;
 }
 
 .chat-wrapper {
   opacity: 0;
+  display: none;
   position: fixed;
   right: 3rem;
   bottom: 6.75rem;
