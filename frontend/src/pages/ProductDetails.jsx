@@ -11,62 +11,70 @@ import {
 import { Rating } from "react-simple-star-rating";
 import { useParams } from "react-router-dom";
 import ImageZoom from "js-image-zoom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 
 import CartMessage from "../components/CartMessage";
 import { addToCart } from "../redux/actions/cartActions";
 
+const fetchProduct = async (productId) => {
+  const product = await axios.get("/api/products/product/" + productId);
+
+  return product.data;
+};
+
+const options = {
+  // width: 400,
+  // zoomWidth: 500,
+  // fillContainer: true,
+  // zoomPosition: "bottom",
+  scale: 2,
+  offset: { vertical: 0, horizontal: 0 },
+};
+
 const ProductDetails = () => {
+  const [product, setProduct] = useState({});
+  const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    const getProduct = async (productId) => {
+      const fetchedProduct = await fetchProduct(productId);
+
+      setProduct(fetchedProduct);
+    };
+
+    getProduct(id);
+  }, [id]);
+
   const addToCartHandler = () => {
-    dispatch(addToCart());
-  };
-
-  const products = useSelector((state) => state.cart.value);
-
-  const options = {
-    // width: 400,
-    // zoomWidth: 500,
-    // fillContainer: true,
-    // zoomPosition: "bottom",
-    scale: 2,
-    offset: { vertical: 0, horizontal: 0 },
+    dispatch(addToCart(id, quantity));
   };
 
   useEffect(() => {
-    new ImageZoom(document.getElementById("first"), options);
-    new ImageZoom(document.getElementById("second"), options);
-    new ImageZoom(document.getElementById("third"), options);
-    new ImageZoom(document.getElementById("fourth"), options);
-  });
+    if (product.images) {
+      for (let image of product.images) {
+        new ImageZoom(document.getElementById(image._id), options);
+      }
+    }
+  }, [product]);
 
   return (
     <Container>
       <CartMessage />
       <Row className="mt-5">
         <Col style={{ zIndex: 1 }} md={4}>
-          <div id="first">
-            <Image
-              crossOrigin="anonymous"
-              fluid
-              src="/images/games-category.png"
-            />
-          </div>
-          <br />
-          <div id="second">
-            <Image fluid src="/images/monitors-category.png" />
-          </div>
-          <br />
-          <div id="third">
-            <Image fluid src="/images/tablets-category.png" />
-          </div>
-          <br />
-          <div id="fourth">
-            <Image fluid src="/images/games-category.png" />
-          </div>
+          {product.images &&
+            product.images.map((image) => (
+              <div key={image._id}>
+                <div id={image._id}>
+                  <Image crossOrigin="anonymous" fluid src={image.path} />
+                </div>
+                <br />
+              </div>
+            ))}
           <br />
         </Col>
         <Col md={8}>
@@ -74,18 +82,16 @@ const ProductDetails = () => {
             <Col md={8}>
               <ListGroup variant="flush">
                 <ListGroup.Item>
-                  <h2>Product name</h2>
+                  <h2>{product.name}</h2>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  <Rating readonly size={20} initialValue={4} /> (1)
+                  <Rating readonly size={20} initialValue={product.rating} /> (
+                  {product.reviewsNumber})
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  Price:&nbsp;<span className="fw-bold">$153</span>
+                  Price:&nbsp;<span className="fw-bold">${product.price}</span>
                 </ListGroup.Item>
-                <ListGroup.Item>
-                  Porta ac consectetur ac Porta ac consectetur ac Porta ac
-                  consectetur ac
-                </ListGroup.Item>
+                <ListGroup.Item>{product.description}</ListGroup.Item>
               </ListGroup>
             </Col>
             <Col md={4}>
@@ -98,11 +104,16 @@ const ProductDetails = () => {
                 </ListGroup.Item>
                 <ListGroup.Item>
                   Quantity:
-                  <Form.Select aria-label="Default select example">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
+                  <Form.Select
+                    value={quantity}
+                    aria-label="Quantity"
+                    onChange={(e) => setQuantity(e.target.value)}
+                  >
+                    {Array.from({ length: product.count }).map((_, idx) => (
+                      <option key={idx} value={idx + 1}>
+                        {idx + 1}
+                      </option>
+                    ))}
                   </Form.Select>
                 </ListGroup.Item>
                 <ListGroup.Item>

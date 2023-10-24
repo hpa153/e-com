@@ -14,9 +14,24 @@ const localUserInfo = localStorage.getItem("userInfo")
   ? JSON.parse(sessionStorage.getItem("userInfo"))
   : {};
 
+const localCartItems = localStorage.getItem("cart")
+  ? JSON.parse(localStorage.getItem("cart"))
+  : [];
+
 const initialState = {
   cart: {
-    value: 0,
+    cartItems: localCartItems,
+    itemsCount:
+      localCartItems.length > 0
+        ? localCartItems.reduce((qty, item) => +item.quantity + qty, 0)
+        : 0,
+    cartSubtotal:
+      localCartItems.length > 0
+        ? localCartItems.reduce(
+            (price, item) => +item.quantity * item.price + price,
+            0
+          )
+        : 0,
   },
   user: {
     userInfo: localUserInfo,
