@@ -36,6 +36,7 @@ const options = {
 const ProductDetails = () => {
   const [product, setProduct] = useState({});
   const [quantity, setQuantity] = useState(1);
+  const [displayMessage, setDisplayMessage] = useState(false);
   const { id } = useParams();
   const dispatch = useDispatch();
 
@@ -51,6 +52,7 @@ const ProductDetails = () => {
 
   const addToCartHandler = () => {
     dispatch(addToCart(id, quantity));
+    setDisplayMessage(true);
   };
 
   useEffect(() => {
@@ -63,7 +65,10 @@ const ProductDetails = () => {
 
   return (
     <Container>
-      <CartMessage />
+      <CartMessage
+        displayMessage={displayMessage}
+        setDisplayMessage={setDisplayMessage}
+      />
       <Row className="mt-5">
         <Col style={{ zIndex: 1 }} md={4}>
           {product.images &&

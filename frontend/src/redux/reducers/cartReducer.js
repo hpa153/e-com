@@ -42,6 +42,17 @@ const cartReducer = (state = INITIAL_CART, action) => {
 
       return newCart;
     }
+    case actionTypes.REMOVE_FROM_CART: {
+      return {
+        ...state,
+        cartItems: state.cartItems.filter(
+          (prod) => prod.productId !== action.payload.productId
+        ),
+        itemsCount: state.itemsCount - action.payload.quantity,
+        cartSubtotal:
+          state.cartSubtotal - action.payload.price * action.payload.quantity,
+      };
+    }
     default: {
       return state;
     }

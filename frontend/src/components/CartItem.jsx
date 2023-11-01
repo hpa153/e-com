@@ -1,6 +1,17 @@
 import { Row, Col, Image, ListGroup, Form, Button } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+
+import { addToCart, removeFromCart } from "../redux/actions/cartActions";
 
 const CartItem = ({ item, orderCompleted = false }) => {
+  const dispatch = useDispatch();
+
+  const removeItemHandler = (productId, quantity, price) => {
+    if (window.confirm("Are you sure?")) {
+      dispatch(removeFromCart(productId, quantity, price));
+    }
+  };
+
   return (
     <>
       <ListGroup.Item>
@@ -15,7 +26,9 @@ const CartItem = ({ item, orderCompleted = false }) => {
           <Col md={3}>
             <Form.Select
               value={item.quantity}
-              onChange={() => {}}
+              onChange={(e) => {
+                dispatch(addToCart(item.productId, e.target.value));
+              }}
               disabled={orderCompleted}
             >
               {[...Array(item.count).keys()].map((x) => (
@@ -29,7 +42,10 @@ const CartItem = ({ item, orderCompleted = false }) => {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => window.confirm("Are you sure?")}
+              disabled={orderCompleted}
+              onClick={() =>
+                removeItemHandler(item.productId, item.quantity, item.price)
+              }
             >
               <i className="bi bi-trash"></i>
             </Button>

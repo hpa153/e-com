@@ -28,7 +28,7 @@ const updateUserRequest = async (
   return user.data;
 };
 
-const fetchUserData = async (userId) => {
+export const fetchUserData = async (userId) => {
   const user = await axios.get("/api/users/profile/" + userId);
 
   return user.data;

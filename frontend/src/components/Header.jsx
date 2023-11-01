@@ -17,6 +17,7 @@ import { logoutUser } from "../redux/actions/userActions";
 const Header = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const itemsCount = useSelector((state) => state.cart.itemsCount);
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -84,7 +85,7 @@ const Header = () => {
               <LinkContainer to="/cart">
                 <Nav.Link>
                   <Badge pill bg="danger">
-                    2
+                    {itemsCount > 0 ? itemsCount : ""}
                   </Badge>
                   <i className="bi bi-cart-dash"></i>&nbsp;CART
                 </Nav.Link>

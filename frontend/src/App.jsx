@@ -48,7 +48,10 @@ const App = () => {
         <Route element={<RouteProtector admin={false} />}>
           <Route path="/user/profile" element={<UserProfile />} />
           <Route path="/user/my-orders" element={<UserOrders />} />
-          <Route path="/user/order-details" element={<UserOrderDetails />} />
+          <Route
+            path="/user/order-details/:orderId"
+            element={<UserOrderDetails />}
+          />
           <Route path="/user/cart" element={<UserCartDetails />} />
         </Route>
 
