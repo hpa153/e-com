@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -7,10 +8,62 @@ import {
   ListGroup,
   Button,
 } from "react-bootstrap";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+import { useSelector } from "react-redux";
 
 import CartItem from "../../components/CartItem";
+import { fetchUserData } from "./UserProfile";
 
 const UserCartDetails = () => {
+  const [user, setUser] = useState({});
+  const [disableButton, setDisableButton] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("PayPal");
+  const navigate = useNavigate();
+  const userId = useSelector((state) => state.user.userInfo._id);
+  const cart = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    const getUserData = async (id) => {
+      const fetchedUser = await fetchUserData(id);
+
+      if (
+        !fetchedUser.phoneNumber ||
+        !fetchedUser.address ||
+        !fetchedUser.city ||
+        !fetchedUser.state ||
+        !fetchedUser.country ||
+        !fetchedUser.zipCode
+      ) {
+        setDisableButton(true);
+      }
+
+      setUser(fetchedUser);
+    };
+
+    getUserData(userId);
+  }, [userId]);
+
+  const orderHandler = async () => {
+    const orderData = {
+      orderTotal: {
+        itemsCount: cart.itemsCount,
+        cartSubtotal: cart.cartSubtotal,
+      },
+      cartItems: cart.cartItems,
+      paymentMethod,
+    };
+
+    try {
+      const order = await axios.post("/api/orders", orderData);
+
+      navigate("/user/order-details/" + order.data._id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Container fluid>
       <Row className="mt-4">
@@ -20,38 +73,30 @@ const UserCartDetails = () => {
           <Row>
             <Col md={6}>
               <h2>Shipping</h2>
-              <b>Name</b>: John Doe <br />
-              <b>Address</b>: 8739 Mayflower St. Los Angeles, CA 90063 <br />
-              <b>Phone</b>: 888 777 666
+              <b>Name</b>: {`${user.firstName} ${user.lastName}`} <br />
+              <b>Address</b>:{" "}
+              {`${user.address}, ${user.city}, ${user.state} ${user.zipCode}, ${user.country}`}
+              <br />
+              <b>Phone</b>: {user.phoneNumber}
             </Col>
             <Col md={6}>
               <h2>Payment method</h2>
-              <Form.Select>
-                <option value="pp">PayPal</option>
+              <Form.Select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+              >
+                <option value="PayPal">PayPal</option>
                 <option value="cod">
                   Cash On Delivery (delivery may be delayed)
                 </option>
               </Form.Select>
             </Col>
-            <Row>
-              <Col>
-                <Alert className="mt-3" variant="danger">
-                  Not delivered. In order to make order, fill out your profile
-                  with correct address, city etc.
-                </Alert>
-              </Col>
-              <Col>
-                <Alert className="mt-3" variant="success">
-                  Not paid yet
-                </Alert>
-              </Col>
-            </Row>
           </Row>
           <br />
           <h2>Order items</h2>
           <ListGroup variant="flush">
-            {Array.from({ length: 3 }).map((item, idx) => (
-              <CartItem key={idx} />
+            {cart.cartItems.map((item, idx) => (
+              <CartItem key={idx} item={item} />
             ))}
           </ListGroup>
         </Col>
@@ -61,21 +106,27 @@ const UserCartDetails = () => {
               <h3>Order summary</h3>
             </ListGroup.Item>
             <ListGroup.Item>
-              Items price (after tax): <span className="fw-bold">$892</span>
+              Items price (after tax):{" "}
+              <span className="fw-bold">${cart.cartSubtotal}</span>
             </ListGroup.Item>
             <ListGroup.Item>
-              Shipping: <span className="fw-bold">included</span>
+              Shipping: <span className="fw-bold">Included</span>
             </ListGroup.Item>
             <ListGroup.Item>
-              Tax: <span className="fw-bold">included</span>
+              Tax: <span className="fw-bold">Included</span>
             </ListGroup.Item>
             <ListGroup.Item className="text-danger">
-              Total price: <span className="fw-bold">$904</span>
+              Total price: <span className="fw-bold">${cart.cartSubtotal}</span>
             </ListGroup.Item>
             <ListGroup.Item>
               <div className="d-grid gap-2">
-                <Button size="lg" variant="danger" type="button">
-                  Pay for the order
+                <Button
+                  variant="danger"
+                  type="button"
+                  disabled={disableButton}
+                  onClick={orderHandler}
+                >
+                  Place Order
                 </Button>
               </div>
             </ListGroup.Item>

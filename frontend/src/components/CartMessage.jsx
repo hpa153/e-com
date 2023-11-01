@@ -1,20 +1,23 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Alert, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-const CartMessage = () => {
-  const [show, setShow] = useState(true);
+const CartMessage = ({ displayMessage, setDisplayMessage }) => {
+  const navigate = useNavigate();
 
   return (
     <Alert
-      show={show}
+      show={displayMessage}
       variant="success"
-      onClose={() => setShow(false)}
+      onClose={() => setDisplayMessage(false)}
       dismissible
     >
       <Alert.Heading>The product was added to your cart!</Alert.Heading>
       <p>
-        <Button variant="success">Go Back</Button>&nbsp;
+        <Button variant="success" onClick={() => navigate(-1)}>
+          Go Back
+        </Button>
+        &nbsp;
         <Link to="/cart">
           <Button variant="danger">To Cart</Button>
         </Link>
