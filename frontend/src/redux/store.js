@@ -4,8 +4,13 @@ import thunk from "redux-thunk";
 
 import cartReducer from "./reducers/cartReducer";
 import userReducer from "./reducers/userReducer";
+import categoryReducer from "./reducers/categoryReducer";
 
-const reducer = combineReducers({ cart: cartReducer, user: userReducer });
+const reducer = combineReducers({
+  cart: cartReducer,
+  user: userReducer,
+  categories: categoryReducer,
+});
 const middleWares = [thunk];
 
 const localUserInfo = localStorage.getItem("userInfo")
@@ -36,6 +41,7 @@ const initialState = {
   user: {
     userInfo: localUserInfo,
   },
+  categories: [],
 };
 
 const store = createStore(

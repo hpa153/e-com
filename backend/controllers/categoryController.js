@@ -88,7 +88,7 @@ const addAttr = async (req, res, next) => {
       await categoryExists.save();
 
       const categories = await Category.find({}).sort({ name: "asc" });
-      return res.status(201).json({ categoriesUpdated: categories });
+      return res.status(201).json({ categoryUpdated: categories });
     } else {
       categoryExists.attrs.push({ key, value: [value] });
     }
