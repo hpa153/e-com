@@ -228,14 +228,7 @@ const updateAdminProduct = async (req, res, next) => {
     product.count = count || product.count;
     product.price = price || product.price;
     product.category = category || product.category;
-
-    if (attributesTable.length > 0) {
-      attributesTable.map((item) => {
-        product.attrs.push(item);
-      });
-    } else {
-      product.attrs = product.attrs;
-    }
+    product.attrs = attributesTable;
 
     await product.save();
 

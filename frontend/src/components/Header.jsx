@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -13,11 +14,19 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { logoutUser } from "../redux/actions/userActions";
+import { getCategories } from "../redux/actions/categoryActions";
 
 const Header = () => {
+  const [isCategoriesFetched, setIsCategoriesFetched] = useState(false);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
   const itemsCount = useSelector((state) => state.cart.itemsCount);
+  const { categories } = useSelector((state) => state.categories);
+
+  useEffect(() => {
+    dispatch(getCategories());
+    setIsCategoriesFetched(true);
+  }, [dispatch]);
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -30,9 +39,13 @@ const Header = () => {
           <Nav className="me-auto">
             <InputGroup>
               <DropdownButton id="dropdown-basic-button" title="All">
-                <Dropdown.Item>Action</Dropdown.Item>
-                <Dropdown.Item>Another action</Dropdown.Item>
-                <Dropdown.Item>Something else</Dropdown.Item>
+                {isCategoriesFetched &&
+                  categories &&
+                  categories?.map((category) => (
+                    <Dropdown.Item key={category.name}>
+                      {category.name}
+                    </Dropdown.Item>
+                  ))}
               </DropdownButton>
               <Form.Control type="text" placeholder="Search in shop..." />
               <Button variant="warning">

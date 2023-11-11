@@ -14,7 +14,7 @@ import { useParams } from "react-router-dom";
 
 import CartItem from "../../components/CartItem";
 import { fetchUserData } from "./UserProfile";
-import { loadPayPalScript } from "../../utils";
+import loadPayPalScript from "../../utils/paypalPayment";
 
 const fetchOrder = async (orderId) => {
   const order = await axios.get("/api/orders/user/" + orderId);

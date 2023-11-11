@@ -18,10 +18,14 @@ import axios from "axios";
 import CartMessage from "../components/CartMessage";
 import { addToCart } from "../redux/actions/cartActions";
 
-const fetchProduct = async (productId) => {
-  const product = await axios.get("/api/products/product/" + productId);
+export const fetchProduct = async (productId) => {
+  try {
+    const product = await axios.get("/api/products/product/" + productId);
 
-  return product.data;
+    return product.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const options = {
