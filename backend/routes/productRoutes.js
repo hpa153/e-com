@@ -27,9 +27,9 @@ router.use(verifyLogin);
 router.use(verifyAdmin);
 router.get("/admin", getAdminProducts);
 router.delete("/admin/:id", deleteProduct);
+router.post("/admin", createAdminProduct);
 router.post("/admin/file-upload", uploadFile);
 router.delete("/admin/image/:imagePath/:productId", deleteFile);
-router.post("/admin", createAdminProduct);
 router.put("/admin/:id", updateAdminProduct);
 
 module.exports = router;

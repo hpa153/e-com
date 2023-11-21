@@ -22,7 +22,7 @@ export const addToCart =
 
 export const removeFromCart =
   (productId, quantity, price) => async (dispatch, getState) => {
-    const product = await axios.get("/api/products/product/" + productId);
+    await axios.get("/api/products/product/" + productId);
 
     dispatch({
       type: actionTypes.REMOVE_FROM_CART,

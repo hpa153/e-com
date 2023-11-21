@@ -16,7 +16,7 @@ import UserOrderDetails from "./pages/user/UserOrderDetails";
 import RoutesWithUserChat from "./components/RoutesWithUserChat";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminChatPanel from "./pages/admin/AdminChatPanel";
-import AdminCreateProducts from "./pages/admin/AdminCreateProduct";
+import AdminCreateProduct from "./pages/admin/AdminCreateProduct";
 import AdminEditProduct from "./pages/admin/AdminEditProduct";
 import AdminEditUser from "./pages/admin/AdminEditUser";
 import AdminOrderDetails from "./pages/admin/AdminOrderDetails";
@@ -61,7 +61,7 @@ const App = () => {
           <Route path="/admin/chats" element={<AdminChatPanel />} />
           <Route
             path="/admin/create-product"
-            element={<AdminCreateProducts />}
+            element={<AdminCreateProduct />}
           />
           <Route
             path="/admin/edit-product/:productId"
