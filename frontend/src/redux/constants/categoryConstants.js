@@ -1,2 +1,4 @@
 export const GET_CATEGORIES = "GET_CATEGORIES";
+export const ADD_CATEGORY = "ADD_CATEGORY";
 export const ADD_ATTRIBUTE = "ADD_ATTRIBUTE";
+export const DELETE_CATEGORY = "DELETE_CATEGORY";

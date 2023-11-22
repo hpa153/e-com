@@ -29,7 +29,7 @@ const addCategory = async (req, res, next) => {
         name: category,
       });
 
-      res.status(201).send("Categroy created!");
+      res.status(201).json(newCategory);
     }
   } catch (error) {
     next(error);
@@ -48,8 +48,6 @@ const deleteCategory = async (req, res, next) => {
       await Category.deleteOne({ _id: categoryExist._id });
       res.json({ categoryDeleted: true });
     }
-
-    res.json(categories);
   } catch (error) {
     next(error);
   }

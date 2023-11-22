@@ -19,8 +19,8 @@ const validateImages = (images) => {
   }
 
   for (let image of arrImages) {
-    if (image.size > 1048576) {
-      return { error: "Exceeded image size limit (1 MB)!" };
+    if (image.size > 2097152) {
+      return { error: "Exceeded image size limit (2 MB)!" };
     }
 
     if (!/jpg|jpeg|png/.test(image.mimetype)) {

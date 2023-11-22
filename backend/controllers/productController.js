@@ -1,10 +1,17 @@
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
 
 const Product = require("../models/ProductModel");
 const prodsPerPage = require("../config/pagination");
 const validateImages = require("../utils/validateImages");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_KEY,
+  api_secret: process.env.CLOUD_SECRET,
+});
 
 const getProducts = async (req, res, next) => {
   // Pagination
@@ -240,48 +247,54 @@ const updateAdminProduct = async (req, res, next) => {
 
 const uploadFile = async (req, res, next) => {
   try {
-    let uploadedImages = req.files.images;
+    /* Upload images to server */
+    // let uploadedImages = req.files.images;
 
-    if (!req.files || !!uploadedImages === false) {
-      return res.status(400).send("No files found!");
-    }
+    // if (!req.files || !!uploadedImages === false) {
+    //   return res.status(400).send("No files found!");
+    // }
 
-    const validationResult = validateImages(uploadedImages);
+    // const validationResult = validateImages(uploadedImages);
 
-    if (validationResult.error) {
-      return res.status(400).send(validationResult.error);
-    }
+    // if (validationResult.error) {
+    //   return res.status(400).send(validationResult.error);
+    // }
 
+    // const product = await Product.findById(req.query.productId).orFail();
+
+    // const uploadDir = path.resolve(
+    //   __dirname,
+    //   "../../frontend",
+    //   "public",
+    //   "images",
+    //   "products"
+    // );
+
+    // if (!Array.isArray(uploadedImages)) {
+    //   uploadedImages = [uploadedImages];
+    // }
+
+    // for (let image of uploadedImages) {
+    //   const fileName = uuidv4() + path.extname(image.name);
+    //   const uploadPath = uploadDir + "/" + fileName;
+
+    //   product.images.push({ path: "/images/products/" + fileName });
+
+    //   image.mv(uploadPath, function (err) {
+    //     if (err) {
+    //       return res.status(500).send(err);
+    //     }
+    //   });
+    // }
+
+    // await product.save();
+
+    // res.send("Images were uploaded!");
+
+    /* Save cloudinary image paths to server */
     const product = await Product.findById(req.query.productId).orFail();
-
-    const uploadDir = path.resolve(
-      __dirname,
-      "../../frontend",
-      "public",
-      "images",
-      "products"
-    );
-
-    if (!Array.isArray(uploadedImages)) {
-      uploadedImages = [uploadedImages];
-    }
-
-    for (let image of uploadedImages) {
-      const fileName = uuidv4() + path.extname(image.name);
-      const uploadPath = uploadDir + "/" + fileName;
-
-      product.images.push({ path: "/images/products/" + fileName });
-
-      image.mv(uploadPath, function (err) {
-        if (err) {
-          return res.status(500).send(err);
-        }
-      });
-    }
-
+    product.images.push({ path: req.body.url });
     await product.save();
-
-    res.send("Images were uploaded!");
   } catch (error) {
     next(error);
   }
@@ -290,14 +303,17 @@ const uploadFile = async (req, res, next) => {
 const deleteFile = async (req, res, next) => {
   try {
     const imagePath = decodeURIComponent(req.params.imagePath);
-    const finalPath = path.resolve("../frontend/public") + imagePath;
+    /* Delete image from server */
+    // const finalPath = path.resolve("../frontend/public") + imagePath;
 
-    fs.unlink(finalPath, (err) => {
-      if (err) {
-        res.status(500).send(err);
-      }
-    });
+    // fs.unlink(finalPath, (err) => {
+    //   if (err) {
+    //     res.status(500).send(err);
+    //   }
+    // });
 
+    /* Delete image from cloudinary */
+    // cloudinary.uploader.destroy(imagePath);
     await Product.findOneAndUpdate(
       { _id: req.params.productId },
       { $pull: { images: { path: imagePath } } }
