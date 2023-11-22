@@ -26,7 +26,7 @@ const validateImages = (images) => {
     }
   }
 
-  return { error: null };
+  return;
 };
 
 export default validateImages;

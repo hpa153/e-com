@@ -1,6 +1,12 @@
 import axios from "axios";
 
-import { GET_CATEGORIES, ADD_ATTRIBUTE } from "../constants/categoryConstants";
+import {
+  GET_CATEGORIES,
+  ADD_ATTRIBUTE,
+  ADD_CATEGORY,
+  DELETE_CATEGORY,
+} from "../constants/categoryConstants";
+import store from "../store";
 
 export const getCategories = () => async (dispatch) => {
   try {
@@ -34,3 +40,42 @@ export const saveAttrToDB =
       console.log(error);
     }
   };
+
+export const addNewCategory = (category) => async (dispatch) => {
+  const allCategories = store.getState().categories.categories;
+
+  try {
+    const newCategory = await axios.post("/api/categories", { category });
+
+    if (newCategory.data) {
+      dispatch({
+        type: ADD_CATEGORY,
+        payload: [...allCategories, newCategory],
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteCategory = (category) => async (dispatch) => {
+  const allCategories = store.getState().categories.categories;
+  const updatedCategories = allCategories.filter(
+    (cat) => cat.name !== category
+  );
+
+  try {
+    const newCategories = await axios.delete(
+      "/api/categories/" + encodeURIComponent(category)
+    );
+
+    if (newCategories.data) {
+      dispatch({
+        type: DELETE_CATEGORY,
+        payload: [...updatedCategories],
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

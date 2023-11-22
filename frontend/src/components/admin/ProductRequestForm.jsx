@@ -16,7 +16,10 @@ import axios from "axios";
 
 import { fetchProduct } from "../../pages/ProductDetails";
 import { saveAttrToDB } from "../../redux/actions/categoryActions";
-// import uploadImagesToCloud from "../../utils/uploadImagesToCloud";
+import {
+  addNewCategory,
+  deleteCategory,
+} from "../../redux/actions/categoryActions";
 
 const onHover = {
   cursor: "pointer",
@@ -71,6 +74,14 @@ const ProductRequestForm = ({ productId = null, handleSubmit }) => {
     }
   }, [product.category, categories, productId]);
 
+  const addCategoryHandler = (e) => {
+    if (e.keyCode && e.keyCode === 13 && e.target.value) {
+      dispatch(addNewCategory(e.target.value));
+      setProduct({ ...product, category: e.target.value });
+      e.target.value = "";
+    }
+  };
+
   const resetAttrList = useCallback(() => {
     const attrValues = attrVal.current;
 
@@ -111,6 +122,13 @@ const ProductRequestForm = ({ productId = null, handleSubmit }) => {
     }
 
     setProduct({ ...product, category: mainCategory });
+  };
+
+  const deleteCategoryHandler = () => {
+    if (window.confirm("Permanently delete this category?")) {
+      dispatch(deleteCategory(product.category));
+      setProduct({ ...product, category: "" });
+    }
   };
 
   const addAttr = (key, value) => {
@@ -268,7 +286,11 @@ const ProductRequestForm = ({ productId = null, handleSubmit }) => {
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicCategory">
-              <Form.Label>Category</Form.Label>
+              <Form.Label>
+                Category
+                <CloseButton onClick={deleteCategoryHandler} />
+                &nbsp; (<small>Remove selected category</small>)
+              </Form.Label>
               <Form.Select
                 required
                 value={product.category ? product.category : ""}
@@ -283,6 +305,18 @@ const ProductRequestForm = ({ productId = null, handleSubmit }) => {
                   </option>
                 ))}
               </Form.Select>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="formBasicNewCategory">
+              <Form.Label>
+                Or create a new category (Reset selected category to create)
+              </Form.Label>
+              <Form.Control
+                name="newCategory"
+                type="text"
+                disabled={product.category !== ""}
+                onKeyUp={addCategoryHandler}
+              />
             </Form.Group>
 
             {attributes.length > 0 && (
