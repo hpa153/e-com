@@ -309,13 +309,14 @@ const ProductRequestForm = ({ productId = null, handleSubmit }) => {
 
             <Form.Group className="mb-3" controlId="formBasicNewCategory">
               <Form.Label>
-                Or create a new category (Reset selected category to create)
+                Or create a new category (E.g. Computer/Laptops)
               </Form.Label>
               <Form.Control
                 name="newCategory"
                 type="text"
                 disabled={product.category !== ""}
                 onKeyUp={addCategoryHandler}
+                placeholder="Reset selected category to create"
               />
             </Form.Group>
 

@@ -7,7 +7,7 @@ const validateImages = (images) => {
     arrImages.push(images);
   }
 
-  if (arrImages.length > 3) {
+  if (images.length > 3) {
     return { error: "The limit of images is 3!" };
   }
 
@@ -26,7 +26,9 @@ const validateImages = (images) => {
     }
   }
 
-  return;
+  return {
+    error: null,
+  };
 };
 
 export default validateImages;

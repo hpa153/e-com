@@ -67,7 +67,7 @@ const App = () => {
             path="/admin/edit-product/:productId"
             element={<AdminEditProduct />}
           />
-          <Route path="/admin/edit-user/:id" element={<AdminEditUser />} />
+          <Route path="/admin/edit-user/:userId" element={<AdminEditUser />} />
           <Route
             path="/admin/order-details/:id"
             element={<AdminOrderDetails />}
