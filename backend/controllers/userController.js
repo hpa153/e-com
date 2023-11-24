@@ -244,7 +244,7 @@ const updateUserAdmin = async (req, res, next) => {
     user.firstName = req.body.firstName || user.firstName;
     user.lastName = req.body.lastName || user.lastName;
     user.email = req.body.email || user.email;
-    user.isAdmin = req.body.isAdmin || user.isAdmin;
+    user.isAdmin = req.body.isAdmin;
 
     await user.save();
 
