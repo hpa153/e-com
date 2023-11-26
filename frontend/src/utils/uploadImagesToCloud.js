@@ -3,8 +3,7 @@ import validateImages from "./validateImages";
 const uploadImagesToCloud = (images, productId) => {
   const validationResult = validateImages(images);
 
-  if (validationResult) {
-    console.log(validationResult.error);
+  if (validationResult.error !== null) {
     return validationResult;
   } else {
     const url = process.env.REACT_APP_CLOUDINARY_URL;

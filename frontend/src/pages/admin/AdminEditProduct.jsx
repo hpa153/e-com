@@ -36,7 +36,7 @@ const AdminEditProduct = () => {
             // );
             const result = uploadImagesToCloud(formData, productId);
 
-            if (result.error) {
+            if (result?.error) {
               return result.error;
             }
           }
