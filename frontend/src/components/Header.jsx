@@ -10,23 +10,49 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import Button from "react-bootstrap/Button";
 import InputGroup from "react-bootstrap/InputGroup";
 import { LinkContainer } from "react-router-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { logoutUser } from "../redux/actions/userActions";
 import { getCategories } from "../redux/actions/categoryActions";
 
 const Header = () => {
-  const [isCategoriesFetched, setIsCategoriesFetched] = useState(false);
+  const [searchCategory, setSearchCategory] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const itemsCount = useSelector((state) => state.cart.itemsCount);
   const { categories } = useSelector((state) => state.categories);
 
   useEffect(() => {
     dispatch(getCategories());
-    setIsCategoriesFetched(true);
   }, [dispatch]);
+
+  const submitHandler = (e) => {
+    if (e.keyCode && e.keyCode !== 13) {
+      return;
+    }
+
+    if (searchQuery.trim()) {
+      if (searchCategory) {
+        navigate(
+          `/product-list/category/${searchCategory.replaceAll(
+            "/",
+            ","
+          )}/search/${searchQuery}/1`
+        );
+      } else {
+        navigate(`/product-list/search/${searchQuery}/1`);
+      }
+    } else {
+      navigate(
+        `/product-list${
+          searchCategory ? "/category/" : ""
+        }${searchCategory.replaceAll("/", ",")}/1`
+      );
+    }
+  };
 
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -38,17 +64,31 @@ const Header = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <InputGroup>
-              <DropdownButton id="dropdown-basic-button" title="All">
-                {isCategoriesFetched &&
-                  categories &&
+              <DropdownButton
+                id="dropdown-basic-button"
+                title={searchCategory ? searchCategory : "All"}
+              >
+                <Dropdown.Item key="All" onClick={() => setSearchCategory("")}>
+                  All
+                </Dropdown.Item>
+                {categories &&
                   categories?.map((category) => (
-                    <Dropdown.Item key={category.name}>
+                    <Dropdown.Item
+                      key={category.name}
+                      onClick={() => setSearchCategory(category.name)}
+                    >
                       {category.name}
                     </Dropdown.Item>
                   ))}
               </DropdownButton>
-              <Form.Control type="text" placeholder="Search in shop..." />
-              <Button variant="warning">
+              <Form.Control
+                type="text"
+                onKeyUp={submitHandler}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search in shop..."
+              />
+              <Button variant="warning" onClick={submitHandler}>
                 <i className="bi bi-search"></i>
               </Button>
             </InputGroup>

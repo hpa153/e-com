@@ -7,7 +7,9 @@ const ProductForList = ({ product }) => {
     <Card style={{ marginTop: "1.5rem", marginBottom: "2.5rem" }}>
       <Row>
         <Col lg={5}>
-          <Card.Img variant="top" src={product.images[0].path} />
+          {product?.images[0] && (
+            <Card.Img variant="top" src={product.images[0].path} />
+          )}
         </Col>
         <Col lg={7}>
           <Card.Body>
