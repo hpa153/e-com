@@ -16,7 +16,6 @@ cloudinary.config({
 const getProducts = async (req, res, next) => {
   // Pagination
   const pageNum = req.query.pageNum || 1;
-  const totalProds = await Product.countDocuments({});
   let queryCondition = false;
 
   // Sort products
@@ -49,7 +48,7 @@ const getProducts = async (req, res, next) => {
   // By category
   // On search bar
   let categoryQueryCondition = {};
-  const categoryName = req.params.categoryName | "";
+  const categoryName = req.params.categoryName || "";
 
   if (categoryName) {
     let a = categoryName.replaceAll(",", "/");
@@ -126,6 +125,8 @@ const getProducts = async (req, res, next) => {
       ],
     };
   }
+
+  const totalProds = await Product.countDocuments(query);
 
   try {
     const products = await Product.find(query)

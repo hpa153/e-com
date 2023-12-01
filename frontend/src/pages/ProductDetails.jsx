@@ -11,8 +11,8 @@ import {
 import { Rating } from "react-simple-star-rating";
 import { useParams } from "react-router-dom";
 import ImageZoom from "js-image-zoom";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useCallback, useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
 import CartMessage from "../components/CartMessage";
@@ -38,11 +38,13 @@ const options = {
 };
 
 const ProductDetails = () => {
+  const user = useSelector((state) => state.user.userInfo);
   const [product, setProduct] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [displayMessage, setDisplayMessage] = useState(false);
   const { id } = useParams();
   const dispatch = useDispatch();
+  const pageEndRef = useRef(null);
 
   useEffect(() => {
     const getProduct = async (productId) => {
@@ -66,6 +68,35 @@ const ProductDetails = () => {
       }
     }
   }, [product]);
+
+  const handleReviewSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const form = e.currentTarget.elements;
+      const formInput = {
+        comment: form.comment.value,
+        rating: form.rating.value,
+      };
+
+      if (e.currentTarget.checkValidity() === true) {
+        try {
+          const reviewedProduct = await axios.post(
+            `/api/products/review/${id}`,
+            formInput
+          );
+
+          setProduct(reviewedProduct.data);
+
+          setTimeout(() => {
+            pageEndRef.current.scrollIntoView({ behavior: "smooth" });
+          }, 200);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
+    [id]
+  );
 
   return (
     <Container>
@@ -106,10 +137,14 @@ const ProductDetails = () => {
             <Col md={4}>
               <ListGroup>
                 <ListGroup.Item>
-                  Status:&nbsp;<span className="fw-bold">In Stock</span>
+                  Status:&nbsp;
+                  <span className="fw-bold">
+                    {product.count > 0 ? "In Stock" : "Out of Stock"}
+                  </span>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                  Price:&nbsp;<span className="fw-bold">$256</span>
+                  Price:&nbsp;
+                  <span className="fw-bold">${product.price * quantity}</span>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   Quantity:
@@ -137,31 +172,41 @@ const ProductDetails = () => {
             <Col className="mt-5">
               <h5>REVIEWS</h5>
               <ListGroup variant="flush">
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <ListGroup.Item key={idx}>
-                    <div className="d-flex justify-content-between">
-                      <span className="fw-bold">Thomas</span>
-                      <span>2023-08-21</span>
-                    </div>
-                    <Rating readonly size={20} initialValue={5} />
-                    <br />
-                    Cras justo odio
-                  </ListGroup.Item>
-                ))}
+                {product.reviews &&
+                  product.reviews.map((review, idx) => (
+                    <ListGroup.Item key={idx}>
+                      <div className="d-flex justify-content-between">
+                        <span className="fw-bold">{review.user.name}</span>
+                        <span>{review.createdAt.toString().substr(0, 10)}</span>
+                      </div>
+                      <Rating readonly size={20} initialValue={review.rating} />
+                      <br />
+                      {review.comment}
+                    </ListGroup.Item>
+                  ))}
+                <div ref={pageEndRef} />
               </ListGroup>
             </Col>
           </Row>
           <hr />
-          <Alert variant="danger">Login first to write a review</Alert>
-          <Form>
-            <Form.Group
-              className="mb-3"
-              controlId="exampleForm.ControlTextarea1"
-            >
+          {!user.firstName && (
+            <Alert variant="danger">Login first to write a review</Alert>
+          )}
+          <Form onSubmit={handleReviewSubmit}>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlComment">
               <Form.Label>Leave a review:</Form.Label>
-              <Form.Control as="textarea" rows={3} />
+              <Form.Control
+                name="comment"
+                as="textarea"
+                rows={3}
+                disabled={!user.firstName}
+              />
             </Form.Group>
-            <Form.Select aria-label="Default select example">
+            <Form.Select
+              aria-label="Product Rating"
+              name="rating"
+              disabled={!user.firstName}
+            >
               <option>Your Rating</option>
               <option value="5">5 (Very good)</option>
               <option value="4">4 (Good)</option>
@@ -169,7 +214,12 @@ const ProductDetails = () => {
               <option value="2">2 (Bad)</option>
               <option value="1">1 (Very bad)</option>
             </Form.Select>
-            <Button className="my-3" variant="primary">
+            <Button
+              type="submit"
+              className="my-3"
+              variant="primary"
+              disabled={!user.firstName}
+            >
               Submit
             </Button>
           </Form>

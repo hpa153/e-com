@@ -212,10 +212,11 @@ const writeReview = async (req, res, next) => {
       product.reviewsNumber = 1;
     } else {
       product.reviewsNumber = product.reviews.length;
-      product.rating =
+      product.rating = Math.round(
         tempRating
           .map((review) => review.rating)
-          .reduce((sum, rating) => sum + rating, 0) / product.reviews.length;
+          .reduce((sum, rating) => sum + rating, 0) / product.reviews.length
+      );
     }
 
     await product.save();

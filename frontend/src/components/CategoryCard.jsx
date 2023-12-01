@@ -2,21 +2,14 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import { LinkContainer } from "react-router-bootstrap";
 
-const CategoryCard = ({ title }) => {
+const CategoryCard = ({ category }) => {
   return (
     <Card>
-      <Card.Img
-        crossOrigin="anonymous"
-        variant="top"
-        src="images/tablets-category.png"
-      />
+      <Card.Img crossOrigin="anonymous" variant="top" src={category.image} />
       <Card.Body>
-        <Card.Title>{title}</Card.Title>
-        <Card.Text>
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
-        </Card.Text>
-        <LinkContainer to="/product-list">
+        <Card.Title>{category.name}</Card.Title>
+        <Card.Text>{category.description}</Card.Text>
+        <LinkContainer to={"/product-list/category/" + category.name + "/1"}>
           <Button variant="primary">View Category</Button>
         </LinkContainer>
       </Card.Body>
