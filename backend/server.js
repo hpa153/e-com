@@ -1,3 +1,5 @@
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
@@ -18,6 +20,8 @@ app.use(fileUpload());
 
 const PORT = 5000;
 // connectDB();
+const httpServer = createServer(app);
+global.io = new Server(httpServer);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -64,7 +68,8 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     // Start server
-    app.listen(PORT, () => {
+    // app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`Server listening to port ${PORT}`);
     });
   })
