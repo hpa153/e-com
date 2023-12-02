@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Row, Col, Form } from "react-bootstrap";
 import {
   LineChart,
@@ -9,142 +10,207 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import axios from "axios";
 
 import AdminLinks from "../../components/admin/AdminLinks";
 
+const getOrdersOnDate = async (date, abctrl) => {
+  try {
+    const orders = await axios.get(`/api/orders/analysis/${date}`, {
+      signal: abctrl.signal,
+    });
+    return orders.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const processOrders = (inputOrders = [], date) => {
+  let orderSum = 0;
+  const orders = inputOrders.map((order) => {
+    orderSum += order.orderTotal.cartSubtotal;
+    const orderDate = new Date(order.createdAt).toLocaleString("en-US", {
+      hour: "numeric",
+      hour12: true,
+      timeZone: "UTC",
+    });
+    return { name: orderDate, [date]: orderSum };
+  });
+  return orders;
+};
+
 const AdminAnalytics = () => {
-  const data = [
-    {
-      name: "12:00 AM",
-      "2022 year": 4000,
-      "2021 year": 4100,
-    },
-    {
-      name: "1:00 AM",
-      "2022 year": 4200,
-      "2021 year": 4300,
-    },
-    {
-      name: "2:00 AM",
-      "2022 year": 4400,
-      "2021 year": 4500,
-    },
-    {
-      name: "3:00 AM",
-      "2022 year": 4600,
-      "2021 year": 4600,
-    },
-    {
-      name: "4:00 AM",
-      "2022 year": 4800,
-      "2021 year": 5000,
-    },
-    {
-      name: "5:00 AM",
-      "2022 year": 5000,
-      "2021 year": 5200,
-    },
-    {
-      name: "6:00 AM",
-      "2022 year": 5200,
-      "2021 year": 5400,
-    },
-    {
-      name: "7:00 AM",
-      "2022 year": 5600,
-      "2021 year": 6000,
-    },
-    {
-      name: "8:00 AM",
-      "2022 year": 6000,
-      "2021 year": 6300,
-    },
-    {
-      name: "9:00 AM",
-      "2022 year": 6400,
-      "2021 year": 7000,
-    },
-    {
-      name: "10:00 AM",
-      "2022 year": 6800,
-      "2021 year": 7200,
-    },
-    {
-      name: "11:00 AM",
-      "2022 year": 7000,
-      "2021 year": 7800,
-    },
-    {
-      name: "12:00 PM",
-      "2022 year": 7200,
-      "2021 year": 8200,
-    },
-    {
-      name: "1:00 PM",
-      "2022 year": 7500,
-      "2021 year": 8400,
-    },
-    {
-      name: "2:00 PM",
-      "2022 year": 7700,
-      "2021 year": 9000,
-    },
-    {
-      name: "3:00 PM",
-      "2022 year": 8000,
-      "2021 year": 9500,
-    },
-    {
-      name: "4:00 PM",
-      "2022 year": 8400,
-      "2021 year": 10000,
-    },
-    {
-      name: "5:00 PM",
-      "2022 year": 9000,
-      "2021 year": 12000,
-    },
-    {
-      name: "6:00 PM",
-      "2022 year": 10500,
-      "2021 year": 17000,
-    },
-    {
-      name: "7:00 PM",
-      "2022 year": 16000,
-      "2021 year": 20000,
-    },
-    {
-      name: "8:00 PM",
-      "2022 year": 17000,
-      "2021 year": 21000,
-    },
-    {
-      name: "9:00 PM",
-      "2022 year": 17400,
-      "2021 year": 22000,
-    },
-    {
-      name: "10:00 PM",
-      "2021 year": 23000,
-    },
-    {
-      name: "11:00 PM",
-      "2021 year": 23500,
-    },
-  ];
+  let previousDate = new Date();
+  previousDate.setDate(previousDate.getDate() - 1);
+  const [firstDate, setFirstDate] = useState({
+    date: new Date(previousDate).toISOString().substring(0, 10),
+    orderData: [],
+  });
+  const [secondDate, setSecondDate] = useState({
+    date: new Date().toISOString().substring(0, 10),
+    orderData: [],
+  });
+
+  useEffect(() => {
+    const abctrl = new AbortController();
+    const getOrders = async () => {
+      const firstDateOrders = await getOrdersOnDate(firstDate.date, abctrl);
+      setFirstDate({
+        ...firstDate,
+        orderData: processOrders(firstDateOrders, firstDate.date),
+      });
+
+      const secondDateOrders = await getOrdersOnDate(secondDate.date, abctrl);
+      setSecondDate({
+        ...secondDate,
+        orderData: processOrders(secondDateOrders, secondDate.date),
+      });
+    };
+
+    if (firstDate.date && secondDate.date) {
+      getOrders();
+    }
+    return () => abctrl.abort();
+  }, [firstDate.date, secondDate.date]);
+
+  // const data = [
+  //   {
+  //     name: "12:00 AM",
+  //     "2022 year": 4000,
+  //     "2021 year": 4100,
+  //   },
+  //   {
+  //     name: "1:00 AM",
+  //     "2022 year": 4200,
+  //     "2021 year": 4300,
+  //   },
+  //   {
+  //     name: "2:00 AM",
+  //     "2022 year": 4400,
+  //     "2021 year": 4500,
+  //   },
+  //   {
+  //     name: "3:00 AM",
+  //     "2022 year": 4600,
+  //     "2021 year": 4600,
+  //   },
+  //   {
+  //     name: "4:00 AM",
+  //     "2022 year": 4800,
+  //     "2021 year": 5000,
+  //   },
+  //   {
+  //     name: "5:00 AM",
+  //     "2022 year": 5000,
+  //     "2021 year": 5200,
+  //   },
+  //   {
+  //     name: "6:00 AM",
+  //     "2022 year": 5200,
+  //     "2021 year": 5400,
+  //   },
+  //   {
+  //     name: "7:00 AM",
+  //     "2022 year": 5600,
+  //     "2021 year": 6000,
+  //   },
+  //   {
+  //     name: "8:00 AM",
+  //     "2022 year": 6000,
+  //     "2021 year": 6300,
+  //   },
+  //   {
+  //     name: "9:00 AM",
+  //     "2022 year": 6400,
+  //     "2021 year": 7000,
+  //   },
+  //   {
+  //     name: "10:00 AM",
+  //     "2022 year": 6800,
+  //     "2021 year": 7200,
+  //   },
+  //   {
+  //     name: "11:00 AM",
+  //     "2022 year": 7000,
+  //     "2021 year": 7800,
+  //   },
+  //   {
+  //     name: "12:00 PM",
+  //     "2022 year": 7200,
+  //     "2021 year": 8200,
+  //   },
+  //   {
+  //     name: "1:00 PM",
+  //     "2022 year": 7500,
+  //     "2021 year": 8400,
+  //   },
+  //   {
+  //     name: "2:00 PM",
+  //     "2022 year": 7700,
+  //     "2021 year": 9000,
+  //   },
+  //   {
+  //     name: "3:00 PM",
+  //     "2022 year": 8000,
+  //     "2021 year": 9500,
+  //   },
+  //   {
+  //     name: "4:00 PM",
+  //     "2022 year": 8400,
+  //     "2021 year": 10000,
+  //   },
+  //   {
+  //     name: "5:00 PM",
+  //     "2022 year": 9000,
+  //     "2021 year": 12000,
+  //   },
+  //   {
+  //     name: "6:00 PM",
+  //     "2022 year": 10500,
+  //     "2021 year": 17000,
+  //   },
+  //   {
+  //     name: "7:00 PM",
+  //     "2022 year": 16000,
+  //     "2021 year": 20000,
+  //   },
+  //   {
+  //     name: "8:00 PM",
+  //     "2022 year": 17000,
+  //     "2021 year": 21000,
+  //   },
+  //   {
+  //     name: "9:00 PM",
+  //     "2022 year": 17400,
+  //     "2021 year": 22000,
+  //   },
+  //   {
+  //     name: "10:00 PM",
+  //     "2021 year": 23000,
+  //   },
+  //   {
+  //     name: "11:00 PM",
+  //     "2021 year": 23500,
+  //   },
+  // ];
   return (
     <Row className="m-5">
       <Col md={2}>
         <AdminLinks />
       </Col>
       <Col md={10}>
-        <h1>Black Friday Cumulative Revenue 11/26/2022 VS 11/27/2021</h1>
+        <h1>
+          Cumulative Revenue {firstDate.date} VS {secondDate.date}
+        </h1>
         <Form.Group controlId="firstDateToCompare">
           <Form.Label>Select First Date To Compare</Form.Label>
           <Form.Control
             type="date"
             name="firstDateToCompare"
+            value={firstDate.date}
+            onChange={(e) =>
+              setFirstDate({ ...firstDate, date: e.target.value })
+            }
             placeholder="First Date To Compare"
           />
         </Form.Group>
@@ -154,12 +220,16 @@ const AdminAnalytics = () => {
           <Form.Control
             type="date"
             name="secondDateToCompare"
+            value={secondDate.date}
+            onChange={(e) =>
+              setSecondDate({ ...secondDate, date: e.target.value })
+            }
             placeholder="Second Date To Compare"
           />
         </Form.Group>
         <ResponsiveContainer width="100%" height={500}>
           <LineChart
-            data={data}
+            // data={data}
             margin={{
               top: 5,
               right: 30,
@@ -182,19 +252,25 @@ const AdminAnalytics = () => {
             />
             <Tooltip />
             <Legend verticalAlign="top" height={36} />
-            <Line
-              type="monotone"
-              dataKey="2021 year"
-              stroke="#8884d8"
-              activeDot={{ r: 8 }}
-              strokeWidth={4}
-            />
-            <Line
-              type="monotone"
-              dataKey="2022 year"
-              stroke="#82ca9d"
-              strokeWidth={4}
-            />
+            {firstDate.orderData && secondDate.orderData && (
+              <>
+                <Line
+                  data={firstDate.orderData}
+                  type="monotone"
+                  dataKey={firstDate.date}
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                  strokeWidth={4}
+                />
+                <Line
+                  data={secondDate.orderData}
+                  type="monotone"
+                  dataKey={secondDate.date}
+                  stroke="#82ca9d"
+                  strokeWidth={4}
+                />
+              </>
+            )}
           </LineChart>
         </ResponsiveContainer>
       </Col>
