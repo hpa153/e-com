@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import axios from "axios";
+import socketIOClient from "socket.io-client";
 
 import AdminLinks from "../../components/admin/AdminLinks";
 
@@ -72,6 +73,43 @@ const AdminAnalytics = () => {
     }
     return () => abctrl.abort();
   }, [firstDate.date, secondDate.date]);
+
+  useEffect(() => {
+    const socket = socketIOClient();
+    const today = new Date().toDateString();
+
+    const ordersUpdateHelper = (newOrder, dateData, setDateData) => {
+      const orderDate = new Date(newOrder.createdAt).toLocaleString("en-US", {
+        hour: "numeric",
+        hour12: true,
+        timeZone: "UTC",
+      });
+
+      const prevOrderData = dateData.orderData;
+      const orderToAdd = {
+        name: orderDate,
+        [dateData.date]: newOrder.orderTotal.cartSubtotal,
+      };
+      setDateData({
+        ...dateData,
+        orderData: [...prevOrderData, orderToAdd],
+      });
+    };
+
+    const socketHandler = (newOrder) => {
+      if (new Date(newOrder.createdAt).toDateString() === today) {
+        if (today === new Date(firstDate.date).toDateString()) {
+          ordersUpdateHelper(newOrder, firstDate, setFirstDate);
+        } else if (today === new Date(secondDate.date).toDateString()) {
+          ordersUpdateHelper(newOrder, secondDate, setSecondDate);
+        }
+      }
+    };
+
+    socket.on("newOrder", socketHandler);
+
+    return () => socket.off("newOrder", socketHandler);
+  }, [firstDate.orderData, secondDate.orderData]);
 
   // const data = [
   //   {
