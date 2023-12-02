@@ -104,7 +104,7 @@ const getAnalysisOrders = async (req, res, next) => {
     endTime.setHours(23, 59, 59, 999);
     const orders = await Order.find({
       createdAt: { $gte: startTime, $lte: endTime },
-    }).sort({ createdAt: "desc" });
+    }).sort({ createdAt: "asc" });
 
     res.json(orders);
   } catch (error) {
