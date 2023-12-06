@@ -1,0 +1,4 @@
+export const SET_CHATROOMS = "SET_CHATROOMS";
+export const SET_SOCKET = "SET_SOCKET";
+export const RECEIVED_MESSAGE = "RECEIVED_MESSAGE";
+export const REMOVE_CHATROOM = "REMOVE_CHATROOM";

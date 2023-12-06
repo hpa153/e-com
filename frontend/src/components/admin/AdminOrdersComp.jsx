@@ -52,7 +52,7 @@ const AdminOrdersComp = ({ fetchOrders }) => {
                       </>
                     }
                   </td>
-                  <td>{order.createdAt.substring(0, 10)}</td>
+                  <td>{order?.createdAt?.substring(0, 10)}</td>
                   <td>${order.orderTotal.cartSubtotal}</td>
                   <td>
                     <i

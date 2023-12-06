@@ -12,9 +12,16 @@ import InputGroup from "react-bootstrap/InputGroup";
 import { LinkContainer } from "react-router-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import socketIOClient from "socket.io-client";
 
 import { logoutUser } from "../redux/actions/userActions";
 import { getCategories } from "../redux/actions/categoryActions";
+import {
+  setChatRooms,
+  setSocket,
+  receivedMessage,
+  removeChatRoom,
+} from "../redux/actions/chatActions";
 
 const Header = () => {
   const [searchCategory, setSearchCategory] = useState("");
@@ -24,10 +31,38 @@ const Header = () => {
   const user = useSelector((state) => state.user);
   const itemsCount = useSelector((state) => state.cart.itemsCount);
   const { categories } = useSelector((state) => state.categories);
+  const { messageReceived } = useSelector((state) => state.chat);
 
   useEffect(() => {
     dispatch(getCategories());
   }, [dispatch]);
+
+  useEffect(() => {
+    let chatSocket;
+    const ringtone = new Audio("/audio/chat-msg.mp3");
+
+    if (user.userInfo.isAdmin) {
+      chatSocket = socketIOClient();
+      dispatch(setSocket(chatSocket));
+
+      chatSocket.emit(
+        "admin connected",
+        "Admin" + Math.floor(Math.random() * 1000000)
+      );
+
+      chatSocket.on("client message to admin", ({ user, message }) => {
+        ringtone.play();
+        dispatch(setChatRooms(user, message));
+        dispatch(receivedMessage(true));
+      });
+
+      chatSocket.on("disconnected", ({ reason, socketId }) => {
+        dispatch(removeChatRoom(socketId));
+      });
+    }
+
+    if (chatSocket) return () => chatSocket.disconnect();
+  }, [user.userInfo.isAdmin, dispatch]);
 
   const submitHandler = (e) => {
     if (e.keyCode && e.keyCode !== 13) {
@@ -98,7 +133,9 @@ const Header = () => {
               <LinkContainer to="/admin/orders">
                 <Nav.Link>
                   Admin
-                  <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                  {messageReceived && (
+                    <span className="position-absolute top-1 start-10 translate-middle p-2 bg-danger border border-light rounded-circle"></span>
+                  )}
                 </Nav.Link>
               </LinkContainer>
             ) : user.userInfo.isAdmin === false ? (
