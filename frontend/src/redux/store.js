@@ -5,11 +5,14 @@ import thunk from "redux-thunk";
 import cartReducer from "./reducers/cartReducer";
 import userReducer from "./reducers/userReducer";
 import categoryReducer from "./reducers/categoryReducer";
+import chatReducer from "./reducers/chatReducer";
+import { initialChatRooms } from "./reducers/chatReducer";
 
 const reducer = combineReducers({
   cart: cartReducer,
   user: userReducer,
   categories: categoryReducer,
+  chat: chatReducer,
 });
 const middleWares = [thunk];
 
@@ -42,6 +45,7 @@ const initialState = {
     userInfo: localUserInfo,
   },
   categories: [],
+  chat: initialChatRooms,
 };
 
 const store = createStore(
