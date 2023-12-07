@@ -2,10 +2,11 @@ import CategoryCard from "../components/CategoryCard";
 import ProductsCarousel from "../components/ProductsCarousel";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
-
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import axios from "axios";
+
+import MetaComponent from "../components/MetaComponent";
 
 const Home = () => {
   const { categories } = useSelector((state) => state.categories);
@@ -33,6 +34,7 @@ const Home = () => {
 
   return (
     <>
+      <MetaComponent />
       <ProductsCarousel bestsellers={bestsellers} />
       <Container>
         <Row xs={1} md={2} className="g-4 mt-3">

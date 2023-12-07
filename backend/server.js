@@ -4,6 +4,7 @@ const express = require("express");
 const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const apiRouter = require("./routes/apiRoutes");
 // const connectDB = require("./config/db");
@@ -12,6 +13,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = express();
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
